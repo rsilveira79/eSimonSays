@@ -47,10 +47,11 @@ byte flagKeyRed = 3;
 byte flagKeyBlue = 4;
 int counterLED = 0;
 int counterLEDcircle = 0;
+int counterLEDAll = 0;
 int reportKeyscounter = 0;
 
 
-const int numReadings = 20;
+const int numReadings = 30;
 
 int readingsGreen[numReadings];      // the readings from the analog input
 int readIndexGreen = 0;              // the index of the current reading
@@ -86,6 +87,7 @@ void setup() {
 // Initialize Timer Interrrupt
   Timer1.initialize(500000);                 // initialize timer1, and set a 1 second period
   Timer1.attachInterrupt(timer_callback);     // attaches callback() as a timer overflow interrupt
+  bitSet(LedBlinkStatus,flagLedAll);
 }
 
 void loop() {
@@ -129,6 +131,7 @@ void timer_callback()
     CountKeyGreen=CountKeyGreen+1;
     if (CountKeyGreen == 3)
     {
+      KeyStatus=0;
       bitSet(KeyStatus,flagKeyGreen);
       bitSet(LedBlinkStatus,flagLedGreen);
       CountKeyGreen=0;
@@ -141,6 +144,7 @@ void timer_callback()
     CountKeyYellow=CountKeyYellow+1;
     if (CountKeyYellow == 3)
     {
+      KeyStatus=0;
       bitSet(KeyStatus,flagKeyYellow);
       bitSet(LedBlinkStatus,flagLedYellow);
       CountKeyYellow=0;
@@ -153,6 +157,7 @@ void timer_callback()
     CountKeyRed=CountKeyRed+1;
     if (CountKeyRed == 3)
     {
+      KeyStatus=0;
       bitSet(KeyStatus,flagKeyRed);
       bitSet(LedBlinkStatus,flagLedRed);
       CountKeyRed=0;
@@ -165,9 +170,10 @@ void timer_callback()
     CountKeyBlue=CountKeyBlue+1;
     if (CountKeyBlue == 3)
     {
+      KeyStatus=0;
       bitSet(KeyStatus,flagKeyBlue);
       bitSet(LedBlinkStatus,flagLedBlue);
-      CountKeyBlue  =0;
+      CountKeyBlue=0;
       }
   }
   
@@ -176,24 +182,24 @@ void timer_callback()
      // bitSet(LedBlinkStatus,flagLedGreen);
     }
 
-/*
   if (bitRead(LedBlinkStatus,flagLedAll))
   {
-    counterLED=counterLED+1;
+    counterLEDAll=counterLEDAll+1;
     digitalWrite(ledGreen, !digitalRead(ledGreen));           // Toggle green led on Timer Interrupt
     digitalWrite(ledYellow, !digitalRead(ledYellow));         // Toggle yellow led on Timer Interrupt
     digitalWrite(ledRed, !digitalRead(ledRed));               // Toggle red led on Timer Interrupt
     digitalWrite(ledBlue, !digitalRead(ledBlue));             // Toggle blue led on Timer Interrupt
-    if (counterLED==10)
+    if (counterLEDAll==10)
     {
       bitClear(LedBlinkStatus,flagLedAll);
       digitalWrite(ledGreen, LOW);
       digitalWrite(ledYellow, LOW);
       digitalWrite(ledRed, LOW);
       digitalWrite(ledBlue, LOW);
+      counterLEDAll=0;
+      delay(1000); // delay to variables stabilize
     }
    }
- */
   
   if(counterLEDcircle==4)
   {
@@ -353,25 +359,40 @@ int moving_average_blue()
 
 void reportKeys()
 {
+  Serial.print("LED Blink status __________: ");
+  Serial.println(LedBlinkStatus, BIN);
+
+  Serial.print("Keypress status __________: ");
+  Serial.println(KeyStatus, BIN);
+
   Serial.print("GREEN __ Avg: ");
   Serial.print(AvgValueGreen);
   Serial.print(" __ Current: ");
-  Serial.println(sensorValueGreen);
+  Serial.print(sensorValueGreen);
+  Serial.print(" __ Max: ");
+  Serial.println(MaxValueGreen);
+  
 
   Serial.print("YELLOW __ Avg: ");
   Serial.print(AvgValueYellow);
   Serial.print(" __ Current: ");
-  Serial.println(sensorValueYellow);
+  Serial.print(sensorValueYellow);
+  Serial.print(" __ Max: ");
+  Serial.println(MaxValueYellow);
 
   Serial.print("RED __ Avg: ");
   Serial.print(AvgValueRed);
   Serial.print(" __ Current: ");
-  Serial.println(sensorValueRed);
+  Serial.print(sensorValueRed);
+  Serial.print(" __ Max: ");
+  Serial.println(MaxValueRed);
 
   Serial.print("BLUE __ Avg: ");
   Serial.print(AvgValueBlue);
   Serial.print(" __ Current: ");
-  Serial.println(sensorValueBlue);
+  Serial.print(sensorValueBlue);
+  Serial.print(" __ Max: ");
+  Serial.println(MaxValueBlue);
   Serial.println();
 
   }
